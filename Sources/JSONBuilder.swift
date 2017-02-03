@@ -36,9 +36,12 @@ public struct JSONBuilder {
         return self.fieldNamingStrategy.translateName(field: field)
     }
 
-    public func convert(object: Any) -> Any? {
+    public func convert(object: Any?) -> Any? {
+        guard let obj = object else {
+            return nil
+        }
 
-        switch object {
+        switch obj {
         case let value as String:
             return value as String
         case let value as Bool:
@@ -58,7 +61,7 @@ public struct JSONBuilder {
         case let value as Array<Any>:
             return value as Array<Any>
         default:
-            let ref = Mirror(reflecting: object)
+            let ref = Mirror(reflecting: obj)
 
             if ref.displayStyle == .struct || ref.displayStyle == .class {
                 var retval: Dictionary<String, Any> = [String: Any]()
@@ -76,11 +79,10 @@ public struct JSONBuilder {
         return nil
     }
 
-    public func serialize(object: Any)-> String? {
+    public func serialize(object: Any?)-> String? {
         guard let JSONObject = self.convert(object: object) else {
             return nil
         }
-
 
         guard JSONSerialization.isValidJSONObject(JSONObject) else {
             print("Invalid JSON Representation")
