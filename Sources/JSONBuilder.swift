@@ -8,8 +8,11 @@
 
 import Foundation
 
+public protocol JSONSerializer {
+    func serialize(object: Any?)-> String?
+}
 
-public struct JSONBuilder {
+public struct JSONBuilder: JSONSerializer {
     let fieldNamingPolicy: FieldNamingPolicy;
     let options: JSONSerialization.WritingOptions
     let fieldNamingStrategy: FieldNamingStrategy
@@ -42,14 +45,21 @@ public struct JSONBuilder {
         }
 
         switch obj {
+        case let value as JSONSerializable:
+            return value.jsonSerialize()
+
         case let value as String:
             return value as String
+
         case let value as Bool:
             return value as Bool
+
         case let value as Int:
             return value as Int
+
         case let value as Double:
             return value as Double
+
         case let value as Dictionary<String, Any>:
             var retval: Dictionary<String, Any> = [String: Any]()
 
@@ -58,8 +68,13 @@ public struct JSONBuilder {
             }
 
             return retval
+
+        case let value as Date:
+            return value.jsonSerialize()
+
         case let value as Array<Any>:
             return value as Array<Any>
+
         default:
             let ref = Mirror(reflecting: obj)
 
@@ -85,8 +100,6 @@ public struct JSONBuilder {
         }
 
         guard JSONSerialization.isValidJSONObject(JSONObject) else {
-            print("Invalid JSON Representation")
-
             return nil
         }
 
