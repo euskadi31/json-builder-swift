@@ -8,8 +8,11 @@
 
 import Foundation
 
+public protocol JSONSerializer {
+    func serialize(object: Any?)-> String?
+}
 
-public struct JSONBuilder {
+public struct JSONBuilder: JSONSerializer {
     let fieldNamingPolicy: FieldNamingPolicy;
     let options: JSONSerialization.WritingOptions
     let fieldNamingStrategy: FieldNamingStrategy
