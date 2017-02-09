@@ -18,6 +18,20 @@ struct User {
     var IsAdmin: Bool
     var Nullable: String?
     var CreatedAt: Date?
+    var Roles: Array<Role>?
+}
+
+struct Role {
+    var name: String?
+}
+
+struct Author {
+    var id: Int?
+}
+
+struct Article {
+    var id: Int?
+    var author: Author?
 }
 
 class JSONBuilderTests: XCTestCase {
@@ -31,10 +45,11 @@ class JSONBuilderTests: XCTestCase {
             Labels: ["foo": "bar", "null": nil],
             IsAdmin: true,
             Nullable: nil,
-            CreatedAt: Date(timeIntervalSince1970: 150)
+            CreatedAt: Date(timeIntervalSince1970: 150),
+            Roles: [Role(name: "USER"), Role(name: "ADMIN")]
         )
 
-        XCTAssertEqual(JSONBuilder().serialize(object: u), "{\"FirstName\":\"Axel\",\"Labels\":{\"foo\":\"bar\"},\"IsAdmin\":true,\"List\":[\"foo\",\"bar\"],\"CreatedAt\":\"1970-01-01T00:02:30+0000\",\"Score\":4.5,\"Id\":1}")
+        XCTAssertEqual(JSONBuilder().serialize(object: u), "{\"FirstName\":\"Axel\",\"Labels\":{\"null\":null,\"foo\":\"bar\"},\"IsAdmin\":true,\"List\":[\"foo\",\"bar\"],\"Nullable\":null,\"CreatedAt\":\"1970-01-01T00:02:30+0000\",\"Roles\":[{\"name\":\"USER\"},{\"name\":\"ADMIN\"}],\"Score\":4.5,\"Id\":1}")
     }
 
     func testBuilderWithLowerCaseWithUnderscoresStrategy() {
@@ -46,10 +61,11 @@ class JSONBuilderTests: XCTestCase {
             Labels: ["foo": "bar"],
             IsAdmin: true,
             Nullable: nil,
-            CreatedAt: Date(timeIntervalSince1970: 150)
+            CreatedAt: Date(timeIntervalSince1970: 150),
+            Roles: [Role(name: "USER"), Role(name: "ADMIN")]
         )
 
-        XCTAssertEqual(JSONBuilder(policy: .lowerCaseWithUnderscores).serialize(object: u), "{\"is_admin\":true,\"labels\":{\"foo\":\"bar\"},\"score\":4.5,\"id\":1,\"first_name\":\"Axel\",\"created_at\":\"1970-01-01T00:02:30+0000\",\"list\":[\"foo\",\"bar\"]}")
+        XCTAssertEqual(JSONBuilder(policy: .lowerCaseWithUnderscores).serialize(object: u), "{\"is_admin\":true,\"labels\":{\"foo\":\"bar\"},\"nullable\":null,\"score\":4.5,\"id\":1,\"first_name\":\"Axel\",\"roles\":[{\"name\":\"USER\"},{\"name\":\"ADMIN\"}],\"created_at\":\"1970-01-01T00:02:30+0000\",\"list\":[\"foo\",\"bar\"]}")
     }
 
     func testBuilderWithLowerCaseWithDashesStrategy() {
@@ -61,10 +77,11 @@ class JSONBuilderTests: XCTestCase {
             Labels: ["foo": "bar"],
             IsAdmin: true,
             Nullable: nil,
-            CreatedAt: Date(timeIntervalSince1970: 150)
+            CreatedAt: Date(timeIntervalSince1970: 150),
+            Roles: [Role(name: "USER"), Role(name: "ADMIN")]
         )
 
-        XCTAssertEqual(JSONBuilder(policy: .lowerCaseWithDashes).serialize(object: u), "{\"labels\":{\"foo\":\"bar\"},\"first-name\":\"Axel\",\"id\":1,\"score\":4.5,\"is-admin\":true,\"list\":[\"foo\",\"bar\"],\"created-at\":\"1970-01-01T00:02:30+0000\"}")
+        XCTAssertEqual(JSONBuilder(policy: .lowerCaseWithDashes).serialize(object: u), "{\"labels\":{\"foo\":\"bar\"},\"nullable\":null,\"first-name\":\"Axel\",\"id\":1,\"score\":4.5,\"is-admin\":true,\"roles\":[{\"name\":\"USER\"},{\"name\":\"ADMIN\"}],\"list\":[\"foo\",\"bar\"],\"created-at\":\"1970-01-01T00:02:30+0000\"}")
     }
 
     func testBuilderWithUpperCamelCaseStrategy() {
@@ -76,10 +93,11 @@ class JSONBuilderTests: XCTestCase {
             Labels: ["foo": "bar"],
             IsAdmin: true,
             Nullable: nil,
-            CreatedAt: Date(timeIntervalSince1970: 150)
+            CreatedAt: Date(timeIntervalSince1970: 150),
+            Roles: [Role(name: "USER"), Role(name: "ADMIN")]
         )
 
-        XCTAssertEqual(JSONBuilder(policy: .upperCamelCase).serialize(object: u), "{\"FirstName\":\"Axel\",\"Labels\":{\"Foo\":\"bar\"},\"IsAdmin\":true,\"List\":[\"foo\",\"bar\"],\"CreatedAt\":\"1970-01-01T00:02:30+0000\",\"Score\":4.5,\"Id\":1}")
+        XCTAssertEqual(JSONBuilder(policy: .upperCamelCase).serialize(object: u), "{\"FirstName\":\"Axel\",\"Labels\":{\"Foo\":\"bar\"},\"IsAdmin\":true,\"List\":[\"foo\",\"bar\"],\"Nullable\":null,\"CreatedAt\":\"1970-01-01T00:02:30+0000\",\"Roles\":[{\"Name\":\"USER\"},{\"Name\":\"ADMIN\"}],\"Score\":4.5,\"Id\":1}")
     }
     
     func testBuilderWithUpperCamelCaseWithSpacesStrategy() {
@@ -91,10 +109,11 @@ class JSONBuilderTests: XCTestCase {
             Labels: ["foo": "bar"],
             IsAdmin: true,
             Nullable: nil,
-            CreatedAt: Date(timeIntervalSince1970: 150)
+            CreatedAt: Date(timeIntervalSince1970: 150),
+            Roles: [Role(name: "USER"), Role(name: "ADMIN")]
         )
 
-        XCTAssertEqual(JSONBuilder(policy: .upperCamelCaseWithSpaces).serialize(object: u), "{\"Labels\":{\"Foo\":\"bar\"},\"Is Admin\":true,\"List\":[\"foo\",\"bar\"],\"First Name\":\"Axel\",\"Score\":4.5,\"Created At\":\"1970-01-01T00:02:30+0000\",\"Id\":1}")
+        XCTAssertEqual(JSONBuilder(policy: .upperCamelCaseWithSpaces).serialize(object: u), "{\"Nullable\":null,\"Labels\":{\"Foo\":\"bar\"},\"Is Admin\":true,\"List\":[\"foo\",\"bar\"],\"First Name\":\"Axel\",\"Roles\":[{\"Name\":\"USER\"},{\"Name\":\"ADMIN\"}],\"Score\":4.5,\"Created At\":\"1970-01-01T00:02:30+0000\",\"Id\":1}")
     }
 
     func testBuilderWithNullObject() {
@@ -103,6 +122,13 @@ class JSONBuilderTests: XCTestCase {
 
     func testBuilderWithBadObject() {
         XCTAssertNil(JSONBuilder().serialize(object: 153))
+    }
+
+    func testBuilderWithNestedObject() {
+        let author = Author(id: 851)
+        let article = Article(id: 125, author: author)
+
+        XCTAssertEqual(JSONBuilder().serialize(object: article), "{\"id\":125,\"author\":{\"id\":851}}")
     }
 
     static var allTests : [(String, (JSONBuilderTests) -> () throws -> Void)] {
