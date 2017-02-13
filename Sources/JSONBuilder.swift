@@ -61,7 +61,7 @@ public struct JSONBuilder: JSONSerializer {
             return value as Double
 
         case let value as Dictionary<String, Any>:
-            var retval: Dictionary<String, Any> = [String: Any]()
+            var retval: [String: Any?] = [:]
 
             for (key, val) in value {
                 retval[self.normalize(field: key)] = self.convert(object: val)
@@ -73,16 +73,33 @@ public struct JSONBuilder: JSONSerializer {
             return value.jsonSerialize()
 
         case let value as Array<Any>:
-            return value as Array<Any>
+            return value.map({ (item: Any) -> Any? in
+                return self.convert(object: item)
+            })
 
         default:
             let ref = Mirror(reflecting: obj)
 
-            if ref.displayStyle == .struct || ref.displayStyle == .class {
-                var retval: Dictionary<String, Any> = [String: Any]()
+            if ref.displayStyle == .optional {
+                if ref.children.count == 0 {
+                    return nil
+                } else {
+                    let (_, some) = ref.children.first!
 
-                for case let (key?, value) in ref.children {
+                    return self.convert(object: some)
+                }
+            }
+
+            if ref.displayStyle == .struct || ref.displayStyle == .class {
+                var retval: [String: Any?] = [:]
+
+                for (key, value) in ref.children {
+                    guard let key = key else {
+                        continue
+                    }
+
                     retval[self.normalize(field: key)] = self.convert(object: value)
+                    
                 }
 
                 return retval
