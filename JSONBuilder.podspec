@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name                      = 'JSONBuilder'
-    s.version                   = '0.1.0'
+    s.version                   = '0.1.1'
     s.summary                   = 'JSON Builder for Swift 3'
     s.author = {
         'Axel Etcheverry' => 'axel@etcheverry.biz'
