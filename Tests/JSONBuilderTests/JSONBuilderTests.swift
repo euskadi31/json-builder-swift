@@ -9,6 +9,22 @@
 import XCTest
 @testable import JSONBuilder
 
+enum TypeTest {
+    case One
+    case Two
+}
+
+enum Status: Int {
+    case Public = 1
+    case Private
+}
+
+extension Status: JSONSerializable {
+    public func jsonSerialize() -> Any {
+        return self.rawValue
+    }
+}
+
 struct User {
     var Id: Int?
     var Score: Double?
@@ -34,6 +50,24 @@ struct Article {
     var author: Author?
 }
 
+struct Track {
+    var type: TypeTest?
+    var status: Status?
+}
+
+struct Numeric {
+    var t1: Int8?
+    var t2: Int16?
+    var t3: Int32?
+    var t4: Int64?
+    var t5: UInt8?
+    var t6: UInt16?
+    var t7: UInt32?
+    var t8: UInt64?
+    var t9: Float?
+    var t10: UInt?
+}
+
 class JSONBuilderTests: XCTestCase {
 
     func testDefaultBuilder() {
@@ -51,6 +85,33 @@ class JSONBuilderTests: XCTestCase {
 
         XCTAssertEqual(JSONBuilder().serialize(object: u), "{\"FirstName\":\"Axel\",\"Labels\":{\"null\":null,\"foo\":\"bar\"},\"IsAdmin\":true,\"List\":[\"foo\",\"bar\"],\"Nullable\":null,\"CreatedAt\":\"1970-01-01T00:02:30+0000\",\"Roles\":[{\"name\":\"USER\"},{\"name\":\"ADMIN\"}],\"Score\":4.5,\"Id\":1}")
     }
+
+    func testSerializeNumeric() {
+        let t = Numeric(
+            t1: 1,
+            t2: 2,
+            t3: 3,
+            t4: 4,
+            t5: 5,
+            t6: 6,
+            t7: 7,
+            t8: 8,
+            t9: 9.1,
+            t10: 10
+        )
+
+        XCTAssertEqual(JSONBuilder().serialize(object: t), "{\"t6\":6,\"t2\":2,\"t9\":9.1,\"t10\":10,\"t5\":5,\"t3\":3,\"t8\":8,\"t1\":1,\"t4\":4,\"t7\":7}")
+    }
+
+    func testSerializeEnum() {
+        let t = Track(
+            type: TypeTest.One,
+            status: Status.Public
+        )
+
+        XCTAssertEqual(JSONBuilder().serialize(object: t), "{\"type\":\"One\",\"status\":1}")
+    }
+
 
     func testBuilderWithLowerCaseWithUnderscoresStrategy() {
         let u = User(
