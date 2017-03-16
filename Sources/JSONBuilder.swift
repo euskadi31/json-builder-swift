@@ -57,8 +57,38 @@ public struct JSONBuilder: JSONSerializer {
         case let value as Int:
             return value as Int
 
+        case let value as Int8:
+            return value as Int8
+
+        case let value as Int16:
+            return value as Int16
+
+        case let value as Int32:
+            return value as Int32
+
+        case let value as Int64:
+            return value as Int64
+
+        case let value as UInt:
+            return value as UInt
+
+        case let value as UInt8:
+            return value as UInt8
+
+        case let value as UInt16:
+            return value as UInt16
+
+        case let value as UInt32:
+            return value as UInt32
+
+        case let value as UInt64:
+            return value as UInt64
+
         case let value as Double:
             return value as Double
+
+        case let value as Float:
+            return value as Float
 
         case let value as Dictionary<String, Any>:
             var retval: [String: Any?] = [:]
@@ -83,11 +113,11 @@ public struct JSONBuilder: JSONSerializer {
             if ref.displayStyle == .optional {
                 if ref.children.count == 0 {
                     return nil
-                } else {
-                    let (_, some) = ref.children.first!
-
-                    return self.convert(object: some)
                 }
+
+                let (_, some) = ref.children.first!
+
+                return self.convert(object: some)
             }
 
             if ref.displayStyle == .struct || ref.displayStyle == .class {
@@ -103,6 +133,8 @@ public struct JSONBuilder: JSONSerializer {
                 }
 
                 return retval
+            } else if ref.displayStyle == .enum {
+                return "\(obj)"
             }
 
             break
